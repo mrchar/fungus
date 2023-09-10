@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import api from "../api";
+
+const router = useRouter();
 
 const formData = ref({
   name: "",
@@ -8,6 +11,10 @@ const formData = ref({
 });
 
 function onClickLogin() {
+  if (!formData.value.name || !formData.value.email) {
+    throw new Error("请输入名称和邮箱地址");
+  }
+
   api.user
     .login(formData.value.name)
     .then((res) => {
@@ -19,6 +26,7 @@ function onClickLogin() {
         .register(formData.value.name, formData.value.email)
         .then((res) => {
           api.user.setCurrentUser(res);
+          router.push("/game");
         })
         .catch((err) => {
           console.error("登陆失败", err);
@@ -29,8 +37,8 @@ function onClickLogin() {
 
 <template>
   <div class="w-screen h-screen overflow-hidden">
-    <div class="max-w-7xl w-fit my-10 mx-auto">
-      <form id="login-form" class="flex flex-col gap-2">
+    <div class="flex w-full h-full justify-center items-center">
+      <form id="login-form" class="flex w-fit h-fit p-2 flex-col gap-2">
         <div class="flex gap-2 justify-end">
           <label for="name">名称</label>
           <input
